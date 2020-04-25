@@ -1,16 +1,8 @@
-ARG BASE_IMAGE_TAG=3
-
-FROM python:$BASE_IMAGE_TAG
-
-RUN echo $(python --version)
-
-ADD . /src
-WORKDIR /src
-
-# https://stackoverflow.com/a/42334357
-RUN sed -i 's/CipherString = DEFAULT@SECLEVEL=2/CipherString = DEFAULT@SECLEVEL=1/g' /etc/ssl/openssl.cnf
-
+FROM python:3
+ENV PYTHONUNBUFFERED 1
+RUN mkdir /code
+WORKDIR /code
+COPY requirements.txt /code/
 RUN pip install -r requirements.txt
-RUN chmod u+x /src/example.py
-
-CMD ["python", "example.py"]
+COPY . /code/
+CMD python -m unittest /code/tests/TestInboundConnections.py
